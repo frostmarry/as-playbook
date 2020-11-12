@@ -1,0 +1,12 @@
+- hosts: all
+  tasks:
+          - name: change PasswordAuth
+            lineinfile:
+                    path: /etc/ssh/sshd_config
+                    regexp: 'PasswordAuthentication no'
+                    line: PasswordAuthentication yes
+
+          - name: reload sshd
+            systemd:
+                    name: sshd
+                    state: reloaded 
