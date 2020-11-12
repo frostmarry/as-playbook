@@ -1,0 +1,35 @@
+- hosts: mysql
+  tasks:
+          - name: install mysql
+            package:
+                    name: "{{item}}"
+                    state: present
+                    update-cache: yes
+            loop:
+                    - mysql-server
+                    - python3-pymysql 
+
+          - name: start mysql service
+            service:
+                    name: mysql
+                    state: started
+                    enabled: yes
+
+
+          - name: change ip bind
+            lineinfile:
+                    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+                    regexp: '127.0.0.1'
+                    line: 0.0.0.0 
+
+          - name: create new user
+            mysql_user:
+                    name: "{{dbuser}}"
+                    password: "{{dbpass}}"
+                    priv: '*.*:ALL'
+                    host: '%'
+                    state: present
+          - name: create database
+            mysql_db:
+                    name: "{{dbname}}"
+                    state: present           
