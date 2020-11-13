@@ -1,0 +1,13 @@
+- hosts: 172.31.2.214:172.31.2.170:172.31.2.34
+  tasks:
+          - name: create .ssh
+            command: mkdir .ssh
+
+          - name: generate ssh key 
+            openssh_keypair:
+                    path: "~/.ssh/{{ssh_name}}"
+                    type: rsa
+                    size: 4096
+                    state: present
+                    force: no
+
