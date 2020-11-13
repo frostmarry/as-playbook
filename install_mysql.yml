@@ -19,8 +19,15 @@
           - name: change ip bind
             lineinfile:
                     path: /etc/mysql/mysql.conf.d/mysqld.cnf
-                    regexp: '127.0.0.1'
-                    line: 0.0.0.0 
+                    regexp: '^bind-address'
+                    line: 'bind-address = 0.0.0.0'
+                    backup: yes
+
+          handlers:
+                  - name: restart mysql
+                    service:
+                            name: mysql
+                            state: restarted
 
           - name: create new user
             mysql_user:

@@ -1,0 +1,20 @@
+- hosts: 172.31.2.214
+  tasks:
+          - name: git clone
+            git:
+                    repo: git@github.com:frostmarry/dumbplay-be.git
+                    version: master
+                    dest: ~/dumbplay-be/
+                    accept_hostkey: yes
+
+                    
+- hosts: 172.31.2.170:172.31.2.34 
+  tasks:
+          - name: git clone
+            git:
+                    repo: git@github.com:frostmarry/dumbplay-fe.git
+                    version: master
+                    dest: ~/dumbplay-fe/
+                    accept_hostkey: yes
+
+                    
