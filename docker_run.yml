@@ -16,7 +16,7 @@
 - hosts: ps
   tasks:
           - name: run prometheus
-            command: docker run -p 9090:9090 prom/prometheus
+            command: docker run -p 9090:9090 -d prom/prometheus
 
 - hosts: ps
   tasks:
