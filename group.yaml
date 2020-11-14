@@ -1,0 +1,44 @@
+- hosts: be
+  tasks:
+          - name: "create users backend"
+            user:
+                    name: be
+                    groups: sudo,docker
+
+
+- hosts: fe1
+  tasks:
+          - name: "create users frontend1"
+            user:
+                    name: fe1
+                    groups: sudo,docker
+
+- hosts: fe2
+  tasks:
+          - name: "create users frontend2"
+            user:
+                    name: fe2
+                    groups: sudo,docker
+
+- hosts: jk
+  tasks:
+          - name: "create users jenkins"
+            user:
+                    name: jk
+                    groups: sudo,docker
+- hosts: ps
+  tasks:
+          - name: "create users prometheus"
+            user:
+                    name: ps
+                    groups: sudo,docker
+                    
+                    
+# Change PasswordAuthentication and rload sshd
+- hosts: docker
+  tasks:
+          - name: reload sshd
+            systemd:
+                    name: sshd
+                    state: restarted
+
