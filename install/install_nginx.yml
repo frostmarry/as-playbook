@@ -1,4 +1,4 @@
-- hosts: nginx
+- hosts: nx
   tasks:
           - name: install nginx
             apt:

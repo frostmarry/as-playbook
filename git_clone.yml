@@ -1,4 +1,4 @@
-- hosts: 172.31.2.214
+- hosts: be
   tasks:
           - name: git clone
             git:
@@ -8,7 +8,7 @@
                     accept_hostkey: yes
 
                     
-- hosts: 172.31.2.170:172.31.2.34 
+- hosts: fe1:fe2 
   tasks:
           - name: git clone
             git:

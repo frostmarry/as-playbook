@@ -1,4 +1,4 @@
-- hosts: 172.31.2.214:172.31.2.170:172.31.2.34
+- hosts: be:fe1:fe2
   tasks:
           - name: create .ssh
             command: mkdir .ssh

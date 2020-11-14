@@ -1,4 +1,4 @@
-- hosts: mysql
+- hosts: db
   tasks:
           - name: install mysql
             package:
@@ -15,20 +15,6 @@
                     state: started
                     enabled: yes
 
-
-          - name: change ip bind
-            lineinfile:
-                    path: /etc/mysql/mysql.conf.d/mysqld.cnf
-                    regexp: '^bind-address'
-                    line: 'bind-address = 0.0.0.0'
-                    backup: yes
-
-          handlers:
-                  - name: restart mysql
-                    service:
-                            name: mysql
-                            state: restarted
-
           - name: create new user
             mysql_user:
                     name: "{{dbuser}}"
@@ -36,7 +22,20 @@
                     priv: '*.*:ALL'
                     host: '%'
                     state: present
+                    
           - name: create database
             mysql_db:
                     name: "{{dbname}}"
                     state: present           
+
+          - name: change ip bind
+            lineinfile:
+                    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+                    regexp: '^bind-address'
+                    line: 'bind-address = 0.0.0.0'
+                    backup: yes
+          
+          - name: restart mysql
+            service:
+                    name: mysql
+                    state: restarted

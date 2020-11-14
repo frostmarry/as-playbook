@@ -20,5 +20,3 @@
           - name: install python docker module
             pip:
                     name: docker
-  
-
