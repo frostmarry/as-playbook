@@ -1,68 +1,42 @@
 - hosts: nx
   tasks:
-    - name: mkdir letsencrypt
-      file:
-        path: "/etc/letsencrypt/{{ item }}"
-        state: directory
-        owner: root
-        group: root
-        mode: u=rwx,g=x,o=x
-      with_items:
-      - account
-      - certs
-      - csrs
-      - keys
+  - name: Upgrade System
+    apt: upgrade=dist update_cache=yes
 
-    - name: Generate a Let's Encrypt account key
-      shell: "if [ ! -f {{ letsencrypt_account_key }} ]; then openssl genrsa 4096 | sudo tee {{ letsencrypt_account_key }}; fi"
+  - name: Add certbot repository
+    apt_repository:
+     repo: 'ppa:certbot/certbot'
 
-    - name: Generate Let's Encrypt private key
-      shell: "openssl genrsa 4096 | sudo tee /etc/letsencrypt/keys/{{ domain_name }}.key"
+  - name: Install Certbot's Nginx package
+    apt:
+     name: python-certbot-nginx
+     state: present
+     
+  - name: Check if certificate already exists.
+    stat:
+      path: /etc/letsencrypt/live/{{ item.servername}}/cert.pem
+    register: letsencrypt_cert
+    with_items: "{{ apache_vhosts }}"
 
-    - name: Generate Let's Encrypt CSR
-      shell: "openssl req -new -sha256 -key /etc/letsencrypt/keys/{{ domain_name }}.key -subj \"/CN={{ domain_name }}\" -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf \"\n[SAN]\nsubjectAltName=DNS:{{ domain_name }},DNS:www.{{ domain_name }}\")) | sudo tee /etc/letsencrypt/csrs/{{ domain_name }}.csr"
-      args:
-        executable: /bin/bash
+  - name: Stop services to allow certbot to generate a cert.
+    service:
+      name: "{{ item }}"
+      state: stopped
+    with_items:
+            -  "{{ certbot_create_standalone_stop_services }}"
 
-    - name: Begin Let's Encrypt challenges
-      letsencrypt:
-        acme_directory: "{{ acme_directory }}"
-        acme_version: "{{ acme_version }}"
-        account_key_src: "{{ letsencrypt_account_key }}"
-        account_email: "{{ acme_email }}"
-        terms_agreed: 1
-        challenge: "{{ acme_challenge_type }}"
-        csr: "{{ letsencrypt_csrs_dir }}/{{ domain_name }}.csr"
-        dest: "{{ letsencrypt_certs_dir }}/{{ domain_name }}.crt"
-        fullchain_dest: "{{ letsencrypt_certs_dir }}/fullchain_{{ domain_name }}.crt"
-        remaining_days: 91
-      register: acme_challenge_your_domain
+  - name: Generate new certificate if one doesn't exist.
+    shell: "certbot certonly --standalone --noninteractive --agree-tos --email {{ certbot_admin_email }} -d {{ item.item.servername}}"
+    with_items: "{{ letsencrypt_cert.results }}"
+    when: item.stat.exists == False
 
-    - name: Implement http-01 challenge files
-      copy:
-        content: "{{ acme_challenge_your_domain['challenge_data'][item]['http-01']['resource_value'] }}"
-        dest: "/var/www/html/{{ acme_challenge_your_domain['challenge_data'][item]['http-01']['resource'] }}"
-        owner: root
-        group: root
-        mode: u=rw,g=r,o=r
-      with_items:
-      - "{{ domain_name }}"
-      - "*.{{ domain_name }}"
+  - name: Start services after cert has been generated.
+    service:
+      name: "{{ item }}"
+      state: started
+    with_items: "{{ certbot_create_standalone_stop_services }}"
 
-      - name: Complete Let's Encrypt challenges
-        letsencrypt:
-          acme_directory: "{{ acme_directory }}"
-          acme_version: "{{ acme_version }}"
-          account_key_src: "{{ letsencrypt_account_key }}"
-          account_email: "{{ acme_email }}"
-          challenge: "{{ acme_challenge_type }}"
-          csr: "{{ letsencrypt_csrs_dir }}/{{ domain_name }}.csr"
-          dest: "{{ letsencrypt_certs_dir }}/{{ domain_name }}.crt"
-          chain_dest: "{{ letsencrypt_certs_dir }}/chain_{{ domain_name }}.crt"
-          fullchain_dest: "{{ letsencrypt_certs_dir }}/fullchain_{{ domain_name }}"
-          data: "{{ acme_challenge_your_domain }}"
-
-      - name: restart nginx
-        service:
-          name: nginx
-          state: restarted
+  - name: restart nginx
+    service:
+      name: nginx
+      state: restarted
