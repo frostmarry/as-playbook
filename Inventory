@@ -5,7 +5,6 @@ db ansible_host=172.31.2.178 ansible_user=db
 jk ansible_host=172.31.2.122 ansible_user=jk
 nx ansible_host=172.31.44.108 ansible_user=public
 ps ansible_host=172.31.2.217 ansible_user=ps
-as ansible_host=172.31.2.233 ansible_user=as
 
 [docker]
 be
