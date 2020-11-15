@@ -13,13 +13,4 @@
           - name: run jenkins
             command: docker run -p 8080:8080 -p 50000:50000 -d -v jenkins_home:/usr/app jenkins/jenkins:lts
 
-- hosts: ps
-  tasks:
-          - name: run prometheus
-            command: docker run -p 9090:9090 -d prom/prometheus
-
-- hosts: ps
-  tasks:
-          - name: run grafana
-            command: docker run -d --name=grafana -p 3000:3000 grafana/grafana
 

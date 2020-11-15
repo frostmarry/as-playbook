@@ -1,0 +1,15 @@
+- name: mkdir docker
+  file:
+    path: /docker/prometheus/
+    state: directory
+
+- name: copy prometheus conf
+  copy:
+    src: prometheus.yml
+    dest: /docker/prometheus/prometheus.yml
+
+- name: run prometheus
+  command: docker run -p 9090:9090 -d prom/prometheus --name prometheus -v /docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+
+- name: run grafana
+  command: docker run -d --name=grafana -p 3000:3000 grafana/grafana
