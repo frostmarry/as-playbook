@@ -2,13 +2,13 @@
   tasks:
     - name: mkdir docker
       file:
-        path: /docker/prometheus/
+        path: /home/ps/prometheus
         state: directory
 
     - name: copy prometheus conf
       copy:
         src: prometheus.yml
-        dest: /docker/prometheus/prometheus.yml
+        dest: /home/ps/prometheus/prometheus.yml
 
     - name: run prometheus
       command: docker run -p 9090:9090 -d -v /home/ps/prometheus:/etc/prometheus prom/prometheus
