@@ -19,12 +19,12 @@
     - name: Generate Let's Encrypt private key
       shell: "openssl genrsa 4096 | sudo tee /etc/letsencrypt/keys/{{ domain_name }}.key"
 
-     -name: "Generate Let's Encrypt CSR"
+    - name: Generate Let's Encrypt CSR
       shell: "openssl req -new -sha256 -key /etc/letsencrypt/keys/{{ domain_name }}.key -subj \"/CN={{ domain_name }}\" -reqexts SAN -config <(cat /etc/ssl/openssl.cnf <(printf \"\n[SAN]\nsubjectAltName=DNS:{{ domain_name }},DNS:www.{{ domain_name }}\")) | sudo tee /etc/letsencrypt/csrs/{{ domain_name }}.csr"
       args:
         executable: /bin/bash
 
-    - name: "Begin Let's Encrypt challenges"
+    - name: Begin Let's Encrypt challenges
       letsencrypt:
         acme_directory: "{{ acme_directory }}"
         acme_version: "{{ acme_version }}"
@@ -66,4 +66,3 @@
         service:
           name: nginx
           state: restarted
-  
