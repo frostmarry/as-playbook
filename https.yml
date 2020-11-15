@@ -1,4 +1,5 @@
 - hosts: nx
+  vars_files: group_vars/certbot
   tasks:
   - name: Upgrade System
     apt: upgrade=dist update_cache=yes

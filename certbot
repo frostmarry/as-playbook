@@ -1,8 +1,0 @@
-certbot_create_if_missing: false
-certbot_create_method: standalone
-certbot_admin_email: elga@hi2.in
-certbot_create_standalone_stop_services:
-  - nginx
-apache_vhosts:
-    - {servername: "elga.instructype.com", documentroot: "/var/www/elga.instructype.com"}
-    - {servername: "*.elga.instructype.com", documentroot: "/var/www/*.elga.instructype.com"}
