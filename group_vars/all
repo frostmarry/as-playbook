@@ -1,0 +1,4 @@
+dbuser: elga
+dbpass: elga
+dbname: dumbplay
+ssh_name: id_rsa
